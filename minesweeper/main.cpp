@@ -23,6 +23,7 @@ void renderText(char *inpText, int x, int y, SDL_Color color);
 void leftClick(int x, int y);
 void rightClick(int x, int y);
 void resetBtnAction();
+vector<Cell*> getNeighbours(int x, int y);
 
 SDL_Window* win = NULL;
 SDL_Surface* surface = NULL;
@@ -84,6 +85,8 @@ void initBoard() {
             gameBoard[i][j].setState(CellState::unopened);
             gameBoard[i][j].setHasMine(false);
             gameBoard[i][j].setAdjacentNum(0);
+            gameBoard[i][j].setRow(i);
+            gameBoard[i][j].setCol(j);
         }
     }
     
@@ -106,18 +109,47 @@ void initBoard() {
         for (int j = 0; j < boardHeight; j++) {
             int count = 0;
             if (!gameBoard[i][j].getHasMine()) {
-                if (j + 1 < boardHeight && gameBoard[i][j+1].getHasMine()) { count++; }
-                if (j - 1 >= 0 && gameBoard[i][j-1].getHasMine()) { count++; }
-                if (i + 1 < boardWidth && gameBoard[i+1][j].getHasMine()) { count++; }
-                if (i - 1 >= 0 && gameBoard[i-1][j].getHasMine()) { count++; }
-                if (i - 1 >= 0 && j + 1 < boardHeight && gameBoard[i-1][j+1].getHasMine()) { count++; }
-                if (i - 1 >= 0 && j - 1 >= 0 && gameBoard[i-1][j-1].getHasMine()) { count++; }
-                if (i + 1 < boardWidth && j + 1 < boardHeight && gameBoard[i+1][j+1].getHasMine()) { count++; }
-                if (i + 1 < boardWidth && j - 1 >= 0 && gameBoard[i+1][j-1].getHasMine()) { count++; }
+                vector<Cell*> neighbours = getNeighbours(i, j);
+                
+                for (Cell* c : neighbours) {
+                    if (c->getHasMine()) { count++; };
+                }
+                
                 gameBoard[i][j].setAdjacentNum(count);
             }
         }
     }
+}
+
+vector<Cell*> getNeighbours(int x, int y) {
+    vector<Cell*> result;
+    
+    if (x + 1 < boardWidth) {
+        result.push_back(&gameBoard[x + 1][y]);
+    }
+    if (x - 1 >= 0) {
+        result.push_back(&gameBoard[x - 1][y]);
+    }
+    if (y + 1 < boardHeight) {
+        result.push_back(&gameBoard[x][y + 1]);
+    }
+    if (y - 1 >= 0) {
+        result.push_back(&gameBoard[x][y - 1]);
+    }
+    if (x - 1 >= 0 && y + 1 < boardHeight) {
+        result.push_back(&gameBoard[x - 1][y + 1]);
+    }
+    if (x + 1 < boardWidth && y + 1 < boardHeight) {
+        result.push_back(&gameBoard[x + 1][y + 1]);
+    }
+    if (x - 1 >= 0 && y - 1 >= 0) {
+        result.push_back(&gameBoard[x - 1][y - 1]);
+    }
+    if (x + 1 < boardWidth && y - 1 >= 0) {
+        result.push_back(&gameBoard[x + 1][y - 1]);
+    }
+    
+    return result;
 }
 
 void leftClick(int x, int y) {
@@ -138,84 +170,17 @@ void leftClick(int x, int y) {
                 }
             }
             else if (gameBoard[x][y].getAdjacentNum() == 0) {
-                if (x + 1 < boardWidth
-                    && gameBoard[x + 1][y].getState() == CellState::unopened
-                    && !gameBoard[x + 1][y].getHasMine()) {
-                    if (gameBoard[x + 1][y].getAdjacentNum() == 0) {
-                        leftClick(x + 1, y);
-                    }
-                    else {
-                        gameBoard[x + 1][y].setState(CellState::opened);
-                    }
-                }
-                if (x - 1 >= 0
-                    && gameBoard[x - 1][y].getState() == CellState::unopened
-                    && !gameBoard[x - 1][y].getHasMine()) {
-                    if (gameBoard[x - 1][y].getAdjacentNum() == 0) {
-                        leftClick(x - 1, y);
-                    }
-                    else {
-                        gameBoard[x - 1][y].setState(CellState::opened);
-                    }
-                }
-                if (y + 1 < boardHeight
-                    && gameBoard[x][y + 1].getState() == CellState::unopened
-                    && !gameBoard[x][y + 1].getHasMine()) {
-                    if (gameBoard[x][y + 1].getAdjacentNum() == 0) {
-                        leftClick(x, y + 1);
-                    }
-                    else {
-                        gameBoard[x][y + 1].setState(CellState::opened);
-                    }
-                }
-                if (y - 1 >= 0
-                    && gameBoard[x][y - 1].getState() == CellState::unopened
-                    && !gameBoard[x][y - 1].getHasMine()) {
-                    if (gameBoard[x][y - 1].getAdjacentNum() == 0) {
-                        leftClick(x, y - 1);
-                    }
-                    else {
-                        gameBoard[x][y - 1].setState(CellState::opened);
-                    }
-                }
-                if (x - 1 >= 0 && y + 1 < boardHeight
-                    && gameBoard[x - 1][y + 1].getState() == CellState::unopened
-                    && !gameBoard[x - 1][y + 1].getHasMine()) {
-                    if (gameBoard[x - 1][y + 1].getAdjacentNum() == 0) {
-                        leftClick(x - 1, y + 1);
-                    }
-                    else {
-                        gameBoard[x - 1][y + 1].setState(CellState::opened);
-                    }
-                }
-                if (x + 1 < boardWidth && y + 1 < boardHeight
-                    && gameBoard[x + 1][y + 1].getState() == CellState::unopened
-                    && !gameBoard[x + 1][y + 1].getHasMine()) {
-                    if (gameBoard[x + 1][y + 1].getAdjacentNum() == 0) {
-                        leftClick(x + 1, y + 1);
-                    }
-                    else {
-                        gameBoard[x + 1][y + 1].setState(CellState::opened);
-                    }
-                }
-                if (x - 1 >= 0 && y - 1 >= 0
-                    && gameBoard[x - 1][y - 1].getState() == CellState::unopened
-                    && !gameBoard[x - 1][y - 1].getHasMine()) {
-                    if (gameBoard[x - 1][y - 1].getAdjacentNum() == 0) {
-                        leftClick(x - 1, y - 1);
-                    }
-                    else {
-                        gameBoard[x - 1][y - 1].setState(CellState::opened);
-                    }
-                }
-                if (x + 1 < boardWidth && y - 1 >= 0
-                    && gameBoard[x + 1][y - 1].getState() == CellState::unopened
-                    && !gameBoard[x + 1][y - 1].getHasMine()) {
-                    if (gameBoard[x + 1][y - 1].getAdjacentNum() == 0) {
-                        leftClick(x + 1, y - 1);
-                    }
-                    else {
-                        gameBoard[x + 1][y - 1].setState(CellState::opened);
+                vector<Cell*> neighbours = getNeighbours(x, y);
+                
+                for (Cell* c : neighbours) {
+                    if (c->getState() == CellState::unopened
+                        && !c->getHasMine()) {
+                        if (c->getAdjacentNum() == 0) {
+                            leftClick(c->getRow(), c->getCol());
+                        }
+                        else {
+                            c->setState(CellState::opened);
+                        }
                     }
                 }
             }
@@ -326,7 +291,11 @@ void draw() {
     for (int i = 0; i < boardWidth; i++) {
         for (int j = 0; j < boardHeight; j++) {
             if (gameBoard[i][j].getState() == CellState::unopened) {
-                SDL_SetRenderDrawColor(render, 180, 180, 180, 255);
+                if (gameBoard[i][j].getHasMine()) {
+                    SDL_SetRenderDrawColor(render, 255, 0, 0, 255);
+                } else {
+                    SDL_SetRenderDrawColor(render, 180, 180, 180, 255);
+                }
                 r.x = 11 + (i * 20); r.y = 61 + (j * 20);
                 r.w = 19; r.h = 19;
                 SDL_RenderFillRect(render, &r);

@@ -11,6 +11,8 @@ Cell::Cell() {
     this->state = CellState::unopened;
     this->hasMine = false;
     this->adjacentNum = 0;
+    this->row = 0;
+    this->col = 0;
 }
 
 CellState Cell::getState() {
@@ -35,4 +37,20 @@ int Cell::getAdjacentNum() {
 
 void Cell::setAdjacentNum(int newVal) {
     this->adjacentNum = newVal;
+}
+
+int Cell::getRow() {
+    return this->row;
+}
+
+void Cell::setRow(int row) {
+    this->row = row;
+}
+
+int Cell::getCol() {
+    return this->col;
+}
+
+void Cell::setCol(int col) {
+    this->col = col;
 }

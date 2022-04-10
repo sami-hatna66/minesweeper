@@ -17,6 +17,8 @@ private:
     CellState state;
     bool hasMine;
     int adjacentNum;
+    int row;
+    int col;
 public:
     Cell();
     CellState getState();
@@ -25,6 +27,10 @@ public:
     void setHasMine(bool newVal);
     int getAdjacentNum();
     void setAdjacentNum(int newVal);
+    int getRow();
+    void setRow(int row);
+    int getCol();
+    void setCol(int col);
 };
 
 #endif /* Cell_hpp */
