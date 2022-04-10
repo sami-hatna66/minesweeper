@@ -12,6 +12,7 @@
 #include <array>
 #include <map>
 #include <vector>
+#include <sstream>
 #include "Cell.hpp"
 using namespace std;
 
@@ -291,11 +292,7 @@ void draw() {
     for (int i = 0; i < boardWidth; i++) {
         for (int j = 0; j < boardHeight; j++) {
             if (gameBoard[i][j].getState() == CellState::unopened) {
-                if (gameBoard[i][j].getHasMine()) {
-                    SDL_SetRenderDrawColor(render, 255, 0, 0, 255);
-                } else {
-                    SDL_SetRenderDrawColor(render, 180, 180, 180, 255);
-                }
+                SDL_SetRenderDrawColor(render, 180, 180, 180, 255);
                 r.x = 11 + (i * 20); r.y = 61 + (j * 20);
                 r.w = 19; r.h = 19;
                 SDL_RenderFillRect(render, &r);
