@@ -25,6 +25,7 @@ void leftClick(int x, int y);
 void rightClick(int x, int y);
 void resetBtnAction();
 vector<Cell*> getNeighbours(int x, int y);
+string secToTimeStamp(int input);
 
 SDL_Window* win = NULL;
 SDL_Surface* surface = NULL;
@@ -63,8 +64,12 @@ GameStatus status = GameStatus::alive;
 int numFlags = 40;
 int flagCount = numFlags;
 
+unsigned int lastTime = 0;
+unsigned int offset = 0;
+unsigned int currentTime = 0;
+
 void init() {
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER);
     TTF_Init();
     win = SDL_CreateWindow("Minesweeper", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 340, 390, SDL_WINDOW_SHOWN);
     initBoard();
@@ -74,7 +79,7 @@ void initBoard() {
     boardWidth = settingsMap[currentDifficulty][0];
     boardHeight = settingsMap[currentDifficulty][1];
     
-    SDL_SetWindowSize(win, 20 + (20 * boardWidth), 70 + (20 * boardHeight));
+    SDL_SetWindowSize(win, 20 + (20 * boardWidth), 95 + (20 * boardHeight));
     
     numFlags = settingsMap[currentDifficulty][2];
     flagCount = numFlags;
@@ -119,6 +124,30 @@ void initBoard() {
                 gameBoard[i][j].setAdjacentNum(count);
             }
         }
+    }
+    
+    offset = currentTime;
+    lastTime = floor(currentTime / 1000);
+}
+
+string secToTimeStamp(int input) {
+    int hrs = floor(input / 3600);
+    input -= (hrs * 3600);
+    int mins = floor(input / 60);
+    int secs = input - (mins * 60);
+    
+    string strHrs = to_string(hrs);
+    string strMins = to_string(mins);
+    string strSecs = to_string(secs);
+    if (strHrs.length() == 1) { strHrs.insert(0, "0"); }
+    if (strMins.length() == 1) { strMins.insert(0, "0"); }
+    if (strSecs.length() == 1) { strSecs.insert(0, "0"); }
+    
+    if (hrs == 0) {
+        return strMins + ":" + strSecs;
+    }
+    else {
+        return strHrs + ":" + strMins + ":" + strSecs;
     }
 }
 
@@ -221,7 +250,7 @@ void draw() {
     SDL_RenderFillRect(render, &r);
     r.x = 0; r.y = 50; r.w = 20 + (20 * boardWidth); r.h = 10;
     SDL_RenderFillRect(render, &r);
-    r.x = 0; r.y = 60 + (20 * boardHeight); r.w = 20 + (20 * boardWidth); r.h = 10;
+    r.x = 0; r.y = 60 + (20 * boardHeight); r.w = 20 + (20 * boardWidth); r.h = 35;
     SDL_RenderFillRect(render, &r);
     r.x = 0; r.y = 0; r.w = 10; r.h = 70 + (20 * boardHeight);
     SDL_RenderFillRect(render, &r);
@@ -327,6 +356,10 @@ void draw() {
         }
     }
     
+    intermediary = secToTimeStamp(floor((SDL_GetTicks64() - offset) / 1000));
+    char * t = intermediary.data();
+    renderText(t, 10, 70 + (20 * boardHeight), colorMap[7]);
+    
     SDL_RenderPresent(render);
 }
 
@@ -355,6 +388,12 @@ int main() {
     bool isQuit = false;
     SDL_Event event;
     while (!isQuit) {
+        currentTime = SDL_GetTicks64();
+        if (status == GameStatus::alive && currentTime > lastTime + 1000) {
+            draw();
+            lastTime = currentTime;
+        }
+        
         if (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 isQuit = true;
