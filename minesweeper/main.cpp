@@ -29,6 +29,8 @@ void rightClick(int x, int y);
 void resetBtnAction();
 vector<Cell*> getNeighbours(int x, int y);
 string secToTimeStamp(int input);
+void relocateMine();
+void labelCells();
 
 SDL_Window* win = NULL;
 SDL_Surface* surface = NULL;
@@ -40,6 +42,8 @@ int boardWidth = 30;
 vector<vector<Cell>> gameBoard (boardWidth, vector<Cell>(boardHeight));
 
 int highlightCoords[] = {-1, -1};
+
+bool isFirstClick;
 
 map<int, SDL_Color> colorMap = {
     {1, { static_cast<Uint8>(0), static_cast<Uint8>(0), static_cast<Uint8>(255) }},
@@ -63,7 +67,7 @@ Difficulties currentDifficulty = Difficulties::intermediate;
 
 ofstream outStream;
 ifstream inStream;
-map<Difficulties, int> highScores = {
+map<Difficulties, Uint64> highScores = {
     {Difficulties::beginner, -1},
     {Difficulties::intermediate, -1},
     {Difficulties::expert, -1}
@@ -75,9 +79,9 @@ GameStatus status = GameStatus::alive;
 int numFlags = 40;
 int flagCount = numFlags;
 
-unsigned int lastTime = 0;
-unsigned int offset = 0;
-unsigned int currentTime = 0;
+Uint64 lastTime = 0;
+Uint64 offset = 0;
+Uint64 currentTime = 0;
 
 void init() {
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER);
@@ -107,6 +111,7 @@ void setupHighScore() {
 }
 
 void initBoard() {
+    isFirstClick = true;
     setupHighScore();
     
     boardWidth = settingsMap[currentDifficulty][0];
@@ -144,6 +149,13 @@ void initBoard() {
         }
     }
     
+    labelCells();
+    
+    offset = currentTime;
+    lastTime = floor(currentTime / 1000);
+}
+
+void labelCells() {
     for (int i = 0; i < boardWidth; i++) {
         for (int j = 0; j < boardHeight; j++) {
             int count = 0;
@@ -158,9 +170,6 @@ void initBoard() {
             }
         }
     }
-    
-    offset = currentTime;
-    lastTime = floor(currentTime / 1000);
 }
 
 string secToTimeStamp(int input) {
@@ -218,6 +227,12 @@ vector<Cell*> getNeighbours(int x, int y) {
 void leftClick(int x, int y) {
     if (x >= 0 && x < boardWidth && y >= 0 && y < boardHeight
         && gameBoard[x][y].getState() != CellState::flagged) {
+        if (isFirstClick && gameBoard[x][y].getHasMine()) {
+            gameBoard[x][y].setHasMine(false);
+            relocateMine();
+            labelCells();
+        }
+        isFirstClick = false;
         if (status == GameStatus::alive) {
             gameBoard[x][y].setState(CellState::opened);
             
@@ -246,6 +261,17 @@ void leftClick(int x, int y) {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+void relocateMine() {
+    for (int i = 0; i < boardWidth; i++) {
+        for (int j = 0; j < boardHeight; j++) {
+            if (!gameBoard[i][j].getHasMine()) {
+                gameBoard[i][j].setHasMine(true);
+                return;
             }
         }
     }
@@ -497,14 +523,14 @@ int main() {
                         status = GameStatus::complete;
                         if (highScores[currentDifficulty] == -1
                             || SDL_GetTicks64() - offset < highScores[currentDifficulty]) {
-                            cout << "New High Score";
+                            highScores[currentDifficulty] = SDL_GetTicks64() - offset;
                             outStream.open("highscores.txt", ofstream::out | ofstream::trunc);
                             for (auto& [key, value] : highScores) {
                                 if (value == -1) {
                                     outStream << "NA\n";
                                 }
                                 else {
-                                    outStream << (to_string(SDL_GetTicks64() - offset) + "\n");
+                                    outStream << (to_string(value) + "\n");
                                 }
                             }
                             outStream.close();
