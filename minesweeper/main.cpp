@@ -13,11 +13,14 @@
 #include <map>
 #include <vector>
 #include <sstream>
+#include <filesystem>
+#include <fstream>
 #include "Cell.hpp"
 using namespace std;
 
 void init();
 void initBoard();
+void setupHighScore();
 void draw();
 void close();
 void renderText(char *inpText, int x, int y, SDL_Color color);
@@ -58,6 +61,14 @@ map <Difficulties, vector<int>> settingsMap = {
 };
 Difficulties currentDifficulty = Difficulties::intermediate;
 
+ofstream outStream;
+ifstream inStream;
+map<Difficulties, int> highScores = {
+    {Difficulties::beginner, -1},
+    {Difficulties::intermediate, -1},
+    {Difficulties::expert, -1}
+};
+
 enum class GameStatus {alive, dead, complete};
 GameStatus status = GameStatus::alive;
 
@@ -75,7 +86,29 @@ void init() {
     initBoard();
 }
 
+void setupHighScore() {
+    inStream.open("highscores.txt");
+    
+    string text;
+    
+    getline(inStream, text);
+    if (text == "NA") { highScores[Difficulties::beginner] = -1; }
+    else { highScores[Difficulties::beginner] = stoi(text); }
+    
+    getline(inStream, text);
+    if (text == "NA") { highScores[Difficulties::intermediate] = -1; }
+    else { highScores[Difficulties::intermediate] = stoi(text); }
+    
+    getline(inStream, text);
+    if (text == "NA") { highScores[Difficulties::expert] = -1; }
+    else { highScores[Difficulties::expert] = stoi(text); }
+    
+    inStream.close();
+}
+
 void initBoard() {
+    setupHighScore();
+    
     boardWidth = settingsMap[currentDifficulty][0];
     boardHeight = settingsMap[currentDifficulty][1];
     
@@ -321,7 +354,12 @@ void draw() {
     for (int i = 0; i < boardWidth; i++) {
         for (int j = 0; j < boardHeight; j++) {
             if (gameBoard[i][j].getState() == CellState::unopened) {
-                SDL_SetRenderDrawColor(render, 180, 180, 180, 255);
+                if (gameBoard[i][j].getHasMine()) {
+                    SDL_SetRenderDrawColor(render, 255, 0, 0, 255);
+                }
+                else {
+                    SDL_SetRenderDrawColor(render, 180, 180, 180, 255);
+                }
                 r.x = 11 + (i * 20); r.y = 61 + (j * 20);
                 r.w = 19; r.h = 19;
                 SDL_RenderFillRect(render, &r);
@@ -360,6 +398,13 @@ void draw() {
     char * t = intermediary.data();
     renderText(t, 10, 70 + (20 * boardHeight), colorMap[7]);
     
+    if (highScores[currentDifficulty] != -1) {
+        intermediary = secToTimeStamp(floor(highScores[currentDifficulty] / 1000));
+        intermediary.insert(0, "Best Time: ");
+        char * t = intermediary.data();
+        renderText(t, -1, 70 + (20 * boardHeight), colorMap[7]);
+    }
+    
     SDL_RenderPresent(render);
 }
 
@@ -369,6 +414,9 @@ void renderText(char *inpText, int x, int y, SDL_Color color) {
     SDL_Texture* text = SDL_CreateTextureFromSurface(render, textSurface);
     SDL_Rect r;
     r.x = x; r.y = y; r.w = textSurface->w; r.h = textSurface->h;
+    if (x == -1) {
+        r.x = ((boardWidth * 20) + 10) - textSurface->w;
+    }
     SDL_RenderCopy(render, text, NULL, &r);
     SDL_DestroyTexture(text);
     SDL_FreeSurface(textSurface);
@@ -447,6 +495,20 @@ int main() {
                     }
                     if (flag) {
                         status = GameStatus::complete;
+                        if (highScores[currentDifficulty] == -1
+                            || SDL_GetTicks64() - offset < highScores[currentDifficulty]) {
+                            cout << "New High Score";
+                            outStream.open("highscores.txt", ofstream::out | ofstream::trunc);
+                            for (auto& [key, value] : highScores) {
+                                if (value == -1) {
+                                    outStream << "NA\n";
+                                }
+                                else {
+                                    outStream << (to_string(SDL_GetTicks64() - offset) + "\n");
+                                }
+                            }
+                            outStream.close();
+                        }
                         draw();
                     }
                 }

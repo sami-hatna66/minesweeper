@@ -11,13 +11,14 @@
 		262B53B527FF43F30029CF3D /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 262B53B427FF43F20029CF3D /* SDL2.framework */; };
 		262B53BB27FF4D7C0029CF3D /* Cell.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262B53B927FF4D7C0029CF3D /* Cell.cpp */; };
 		262B53BD27FF55D40029CF3D /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 262B53BC27FF55D40029CF3D /* SDL2_ttf.framework */; };
-		262B53C427FF9DA00029CF3D /* minesweeper.ttf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 262B53C327FF9D830029CF3D /* minesweeper.ttf */; };
 		262B53C627FF9E4A0029CF3D /* mine.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 262B53C527FF9E440029CF3D /* mine.bmp */; };
 		262B53C8280098D60029CF3D /* flag.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 262B53C7280098D10029CF3D /* flag.bmp */; };
 		262B53CA2800A2A30029CF3D /* mineHL.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 262B53C92800A29E0029CF3D /* mineHL.bmp */; };
 		262B53CD2800C7390029CF3D /* deadbtn.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 262B53CB2800C72E0029CF3D /* deadbtn.bmp */; };
 		262B53CE2800C7390029CF3D /* smilebtn.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 262B53CC2800C72E0029CF3D /* smilebtn.bmp */; };
 		262B53D028020A7F0029CF3D /* winbtn.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 262B53CF28020A790029CF3D /* winbtn.bmp */; };
+		26C68D23280B6AE4004FD1DF /* minesweeper.ttf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 262B53C327FF9D830029CF3D /* minesweeper.ttf */; };
+		26C68D25280B6B0F004FD1DF /* highscores.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 26C68D21280B67EA004FD1DF /* highscores.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,13 +28,14 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
+				26C68D25280B6B0F004FD1DF /* highscores.txt in CopyFiles */,
+				26C68D23280B6AE4004FD1DF /* minesweeper.ttf in CopyFiles */,
 				262B53D028020A7F0029CF3D /* winbtn.bmp in CopyFiles */,
 				262B53CD2800C7390029CF3D /* deadbtn.bmp in CopyFiles */,
 				262B53CE2800C7390029CF3D /* smilebtn.bmp in CopyFiles */,
 				262B53CA2800A2A30029CF3D /* mineHL.bmp in CopyFiles */,
 				262B53C8280098D60029CF3D /* flag.bmp in CopyFiles */,
 				262B53C627FF9E4A0029CF3D /* mine.bmp in CopyFiles */,
-				262B53C427FF9DA00029CF3D /* minesweeper.ttf in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,6 +57,7 @@
 		262B53CC2800C72E0029CF3D /* smilebtn.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = smilebtn.bmp; sourceTree = "<group>"; };
 		262B53CF28020A790029CF3D /* winbtn.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = winbtn.bmp; sourceTree = "<group>"; };
 		262B53D1280327360029CF3D /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		26C68D21280B67EA004FD1DF /* highscores.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = highscores.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +122,7 @@
 				262B53C7280098D10029CF3D /* flag.bmp */,
 				262B53C327FF9D830029CF3D /* minesweeper.ttf */,
 				262B53C527FF9E440029CF3D /* mine.bmp */,
+				26C68D21280B67EA004FD1DF /* highscores.txt */,
 			);
 			path = assets;
 			sourceTree = "<group>";
